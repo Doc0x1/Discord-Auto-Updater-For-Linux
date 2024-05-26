@@ -1,0 +1,6 @@
+[Unit]
+Description=Automatically Update Discord
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/update_discord.sh
