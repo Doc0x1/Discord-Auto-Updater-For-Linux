@@ -4,7 +4,7 @@
 DISCORD_DIR="/usr/share/discord"
 
 # URL to fetch the latest .deb package
-DISCORD_DOWNLOAD_URL="https://discord.com/api/download/stable?platform=linux&format=deb"
+DISCORD_DOWNLOAD_URL="https://discord.com/api/download?platform=linux"
 
 # Temporary directory for downloading the latest package
 TEMP_DIR="/tmp/discord_update"
