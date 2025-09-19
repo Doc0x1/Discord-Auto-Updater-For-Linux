@@ -1,43 +1,113 @@
 # Discord Auto Updater for Linux
 
-## What This Is
+A safe and portable **auto-updater wrapper** for Discord on Linux.
+This replaces the default Discord launcher with a wrapper that:
 
-This project provides a wrapper script that automatically checks for updates and installs the latest version of Discord whenever it is launched. This ensures that you always have the latest version of Discord without manually downloading and installing updates. The setup script supports both APT (Debian-based) and AUR (Arch-based) distributions.
+* Checks the currently installed version
+* Downloads the latest release from the official Discord API
+* Updates only when needed
+* Restarts Discord automatically
 
-## How It Works
+---
 
-1. **Wrapper Script**: The wrapper script (`discord-launcher.sh`) performs the following tasks each time Discord is launched:
-   - Checks the currently installed version of Discord.
-   - Fetches the latest version available from the Discord servers.
-   - Compares the installed version with the latest version.
-   - If an update is available, closes the running Discord application, downloads the latest version, installs it, and then launches Discord.
-   
-2. **Setup Script**: The setup script (`setup_discord_update.sh`) automates the installation process:
-   - Detects the package manager (APT or Pacman).
-   - Installs necessary dependencies (`jq` and `curl`).
-   - Downloads the wrapper script from GitHub.
-   - Backs up the original Discord launcher.
-   - Replaces the original launcher with a symlink to the wrapper script.
+## ✨ Features
 
-## Install Instructions
+* ✅ **Safe process handling** – only kills legitimate Discord GUI processes (not the updater or unrelated processes)
+* ✅ **Cross-distro support**
 
-### Prerequisites
+  * **Debian/Ubuntu** → uses official `.deb` packages
+  * **Other distros** → falls back to official `.tar.gz` packages (`/opt/discord`)
+* ✅ **Atomic updates** – version is compared before install, minimizing downloads
+* ✅ **Stable wrapper path** – lives in `/usr/local/lib/discord-updater/`, not `/tmp`
+* ✅ **Locking** – prevents race conditions if you double-launch
+* ✅ **Configurable channel** – supports `stable`, `canary`, or `ptb` via `DISCORD_CHANNEL`
+* ✅ **Least privilege** – uses `sudo` only for package installation or system-wide changes
 
-- A system running a Debian-based (APT) or Arch-based (AUR) Linux distribution.
-- Discord installed in `/usr/share/discord`.
+---
 
-### Installation Steps
+## 📦 Installation
 
-1. **Download and Run the Setup Script**:
+Run the following commands:
 
-   ```bash
-   curl -L https://raw.githubusercontent.com/Doc0x1/Discord-Auto-Updater-For-Linux/master/setup_discord_update.sh -o setup_discord_update.sh
-   chmod +x setup_discord_update.sh
-   sudo ./setup_discord_update.sh
-   ```
+```bash
+curl -L https://raw.githubusercontent.com/Doc0x1/Discord-Auto-Updater-For-Linux/master/setup_discord_update.sh -o setup_discord_update.sh
+chmod +x setup_discord_update.sh
+sudo ./setup_discord_update.sh
+```
 
-2. **Never have to Update Discord Again**:
-   
-   After the setup script runs, it will download the discord-launcher.sh script.
-   
-   This script replaces the default /usr/share/discord/Discord executable so that it checks and automatically updates Discord every time Discord is run.
+---
+
+## ⚙️ Usage
+
+Just **launch Discord as usual** from your applications menu or by running:
+
+```bash
+discord
+```
+
+The wrapper will:
+
+1. Acquire a lock (no multiple updaters running at once)
+2. Check your installed version (`build_info.json`)
+3. Download the latest `.deb` or `.tar.gz` from Discord’s servers
+4. If a newer version exists:
+
+   * Close running Discord instances safely
+   * Install the update
+   * Relaunch Discord
+5. If up to date:
+
+   * Skip update and launch immediately
+
+---
+
+## 🔄 Channels
+
+By default, the updater installs the **stable** release.
+To use **canary** or **ptb**, set the environment variable in your shell or profile:
+
+```bash
+export DISCORD_CHANNEL=canary
+```
+
+Add to `~/.profile` or `~/.bashrc` to make it persistent.
+
+---
+
+## 🗂 Install Paths
+
+* **Debian/Ubuntu (using `.deb`):** `/usr/share/discord`
+
+  * Original binary moved to `/usr/share/discord/Discord.orig`
+  * Wrapper replaces `/usr/share/discord/Discord`
+* **Other distros (using `.tar.gz`):** `/opt/discord`
+
+  * Wrapper installed as `/usr/local/bin/discord`
+  * Desktop entry created in `/usr/local/share/applications/discord.desktop`
+
+---
+
+## 📝 Logs
+
+Logs are stored in:
+
+```
+~/.local/state/discord-updater/logs/run.log
+```
+
+Useful for troubleshooting update issues.
+
+---
+
+## 🚀 Roadmap
+
+* [ ] Add checksum verification for extra safety
+* [ ] Add optional systemd timer for background silent updates
+* [ ] Add user config file for advanced settings
+
+---
+
+## ⚠️ Disclaimer
+
+This tool downloads official Discord builds directly from Discord’s API.
+It does **not** modify Discord binaries beyond installation. Use at your own risk.
